@@ -1,0 +1,37 @@
+---
+- name: Deploy Node.js Application
+  hosts: vbox
+  become: yes
+  tasks:
+    - name: Install Node.js and npm
+      apt:
+        name:
+          - nodejs
+          - npm
+        state: present
+
+    - name: Create target directory
+      file:
+        path: /home/ais
+        state: directory
+        mode: '0755'
+
+    - name: Copy application file
+      copy:
+        src: /home/lup/project-ansible/app.js
+        dest: /home/ais/app.js
+
+    - name: Copy package.json
+      copy:
+        src: /home/lup/project-ansible/package.json
+        dest: /home/ais/package.json
+
+    - name: Install dependencies
+      npm:
+        path: /home/ais
+        state: present
+
+    - name: Start Node.js application
+      command: node /home/ais/app.js
+      async: 10
+      poll: 0

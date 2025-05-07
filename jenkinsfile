@@ -16,13 +16,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                dockerBuildImage('azeyna/jma:3.0')
+                dockerBuildImage('lop/jma:3.0')
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                dockerPush('azeyna/jma:3.0')
+                dockerPush('lop/jma:3.0')
             }
         }
     }

@@ -1,13 +1,12 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Build JAR') {
-            steps {
-                buildJar()
-            }
+stage('Build JAR') {
+    steps {
+        withMaven(maven: 'Maven 3.9.0') {
+            sh 'mvn clean package'
         }
-
+    }
         stage('Docker Login') {
             steps {
                 dockerLogin()

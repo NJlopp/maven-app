@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'lop/jma'
+        IMAGE_NAME = 'njdker/demo-app'
         IMAGE_TAG = '3.0'
     }
 

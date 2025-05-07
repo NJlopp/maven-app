@@ -1,27 +1,39 @@
 pipeline {
     agent any
 
-stage('Build JAR') {
-    steps {
-        withMaven(maven: 'Maven 3.9.0') {
-            sh 'mvn clean package'
-        }
+    tools {
+        maven 'Maven 3.9.0'
     }
+
+    environment {
+        IMAGE_NAME = 'lop/jma'
+        IMAGE_TAG = '3.0'
+    }
+
+    stages {
+        stage('Build JAR') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
         stage('Docker Login') {
             steps {
-                dockerLogin()
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                dockerBuildImage('lop/jma:3.0')
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                dockerPush('lop/jma:3.0')
+                sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
             }
         }
     }

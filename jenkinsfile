@@ -1,56 +1,31 @@
+@Library('jenkins-shared-library') _
+
 pipeline {
     agent any
 
-      tools {
-        maven 'maven-3.9'
-    }
-
     stages {
-        stage('Build jar') {
+        stage('Build JAR') {
             steps {
-                sh 'mvn package'
+                buildJar()
             }
         }
 
-        stage('Build Image') {
+        stage('Docker Login') {
             steps {
-                script {
-                    echo "Building the Docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'docker build -t njdker/demo-app:jma-2.0 .'
-                        sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh 'docker push njdker/demo-app:jma-2.0'
-                    }
-                }
+                dockerLogin()
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    echo "Deploying the application..."
-                }
+                dockerBuildImage('azeyna/jma:3.0')
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                dockerPush('azeyna/jma:3.0')
             }
         }
     }
 }
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building the application...'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Testing the application...'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying the application...'
-            }
-        }
-    }
-
